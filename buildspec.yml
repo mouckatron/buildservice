@@ -1,0 +1,19 @@
+version: 0.1
+phases:
+  install:
+    commands:
+      - echo installing nothing...
+  pre_build:
+    commands:
+      - echo installing dependencies...
+      - go get -u
+  build:
+    commands:
+      # - echo testing...
+      # - echo building...
+      - go build
+artifacts:
+  files:
+    - "**/*"
+  discard-paths: no
+  base-directory: dist/arclog

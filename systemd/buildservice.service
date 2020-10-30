@@ -1,0 +1,15 @@
+[Unit]
+Description=Buildservice simple CICD
+StartLimitInterval=200
+StartLimitBurst=5
+
+[Service]
+User=buildservice
+Environment=
+Restart=on-failure
+RestartSec=30
+WorkingDirectory=/home/buildservice
+ExecStart=/usr/bin/buildservice
+
+[Install]
+WantedBy=multi-user.target
