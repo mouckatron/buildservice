@@ -1,42 +1,47 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
-	"math/rand"
-	"os"
-	"os/signal"
-	"time"
+	"os/exec"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	setupSignals()
+
+	router := gin.Default()
+
+	router.POST("/build/git", buildGit)
+
+	router.Run()
+
 }
 
-func setupSignals() {
-	sigs := make(chan os.Signal, 1)
+func buildGit(c *gin.Context) {
 
-	// catch all signals since not explicitly listing
-	signal.Notify(sigs)
-	//signal.Notify(sigs,syscall.SIGQUIT)
+	url := c.Query("url")
 
-	// method invoked upon seeing signal
-	go func() {
-		s := <-sigs
-		log.Printf("RECEIVED SIGNAL: %s", s)
-		appCleanup()
-		os.Exit(1)
-	}()
-
-	for {
-		log.Printf("hello, world!")
-
-		// wait random number of milliseconds
-		Nsecs := rand.Intn(3000)
-		log.Printf("About to sleep %dms before looping again", Nsecs)
-		time.Sleep(time.Millisecond * time.Duration(Nsecs))
+	dir, err := ioutil.TempDir("", "buildservice")
+	if err != nil {
+		log.Fatal(err)
+		// gin return 500 server error here
+	} else {
+		log.Println(dir)
 	}
+	// defer os.RemoveAll(dir)
 
+	log.Println(execCmd(dir, "git", "clone", url, dir))
+
+	log.Println(execCmd(dir, "make", "build"))
 }
 
-func appCleanup() {
+func execCmd(dir string, cmd string, args ...string) (output string, err error) {
+	c := exec.Command(cmd, args...)
+	c.Dir = dir
+	_output, err := c.Output()
+
+	output = string(_output)
+
+	return
 }

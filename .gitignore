@@ -17,3 +17,4 @@
 
 bin/**
 !bin/.gitkeep
+cmd/buildservice/buildservice

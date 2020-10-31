@@ -5,11 +5,11 @@ StartLimitBurst=5
 
 [Service]
 User=buildservice
-Environment=
+Environment=GOPATH=/home/buildservice/golang PATH=/home/buildservice/bin:/home/buildservice/golang/bin:/opt/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 Restart=on-failure
 RestartSec=30
 WorkingDirectory=/home/buildservice
-ExecStart=/usr/bin/buildservice
+ExecStart=/home/buildservice/bin/buildservice
 
 [Install]
 WantedBy=multi-user.target
