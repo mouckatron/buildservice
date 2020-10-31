@@ -31,15 +31,19 @@ func buildGit(c *gin.Context) {
 	}
 	// defer os.RemoveAll(dir)
 
-	log.Println(execCmd(dir, "git", "clone", url, dir))
+	output, err := execCmd(dir, "git", "clone", url, dir)
+	log.Println(output)
+	log.Println(err)
 
-	log.Println(execCmd(dir, "make", "build"))
+	output, err = execCmd(dir, "make", "build")
+	log.Println(output)
+	log.Println(err)
 }
 
 func execCmd(dir string, cmd string, args ...string) (output string, err error) {
 	c := exec.Command(cmd, args...)
 	c.Dir = dir
-	_output, err := c.Output()
+	_output, err := c.CombinedOutput()
 
 	output = string(_output)
 
