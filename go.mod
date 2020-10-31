@@ -1,4 +1,4 @@
-module moucka.cloud/buildservice/v2
+module github.com/mouckatron/buildservice/v2
 
 go 1.15
 

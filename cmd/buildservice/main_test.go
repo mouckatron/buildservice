@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"strings"
 	"testing"
 )
 
@@ -28,4 +30,25 @@ func TestExecCmdMultiple(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestWorkdirAndBuildID(t *testing.T) {
+
+	prefix := "/tmp/buildservice"
+
+	dir, id, err := workdirAndBuildID()
+	defer os.RemoveAll(dir)
+
+	if !strings.HasPrefix(dir, prefix) {
+		t.Errorf("Temp directory does not start with %s, got %s", prefix, dir)
+	}
+
+	if !strings.HasSuffix(dir, id) || len(dir) == len(id) {
+		t.Errorf("ID is not the temp directory suffix: wanted suffix of %s, got %s", dir, id)
+	}
+
+	if err != nil {
+		t.Errorf("Got error creating temp directory: %s", err)
+	}
+
 }
