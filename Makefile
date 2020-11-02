@@ -14,13 +14,13 @@ install:
 	mkdir $(home_dir)/golang && chown $(user).$(user) $(home_dir)/golang
 	mkdir $(home_dir)/bin && chown $(user).$(user) $(home_dir)/bin
 	cp bin/buildservice $(home_dir)/bin/buildservice
-	cp systemd/buildservice.service /etc/systemd/system/buildservice.service
+	cp init/buildservice.service /etc/systemd/system/buildservice.service
 	systemctl enable buildservice
 	systemctl start buildservice
 
 upgrade:
 	systemctl stop buildservice
-	cp systemd/buildservice.service /etc/systemd/system/buildservice.service
+	cp init/buildservice.service /etc/systemd/system/buildservice.service
 	cp bin/buildservice $(home_dir)/bin/buildservice
 	systemctl daemon-reload
 	systemctl start buildservice
