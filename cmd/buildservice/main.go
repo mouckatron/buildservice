@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mouckatron/buildservice/v2/internal/buildrunner"
+	"github.com/mouckatron/buildservice/v2/cmd/internal/buildrunner"
 )
 
 func main() {
