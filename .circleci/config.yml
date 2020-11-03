@@ -9,7 +9,8 @@ jobs:
     working_directory: /go/src/github.com/mouckatron/buildservice.git
     steps:
       - checkout
-      - run: go get -v -t -d ./...
+      - run:
+          working_directory: cmd/buildservice
+          command: go get -v -t -d
       - run: go test -v -coverprofile=coverage.txt -covermode=atomic ./...
       - run: bash <(curl -s https://codecov.io/bash)
-
