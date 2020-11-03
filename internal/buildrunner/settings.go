@@ -18,7 +18,7 @@ type BuildSettings struct {
 	LogFile       *os.File
 }
 
-// CodeDir retuns the code directory from BuildSettings
+// CodeDir returns the code directory from BuildSettings
 func (b *BuildSettings) CodeDir() string {
 	return filepath.Join(b.WorkingDir, "code")
 }
