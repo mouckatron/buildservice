@@ -10,7 +10,7 @@ build:
 	go build -o bin/buildservice cmd/buildservice/main.go
 
 install:
-	id -u $(user) || (useradd -mrU $(user) && sudo -u $(user) ssh-keygen -t rsa -b 2048 -f $(home_dir)/.ssh/id_rsa -N "" -q)
+	id -u $(user) || (useradd -mrU -s /bin/bash $(user) && sudo -u $(user) ssh-keygen -t rsa -b 2048 -f $(home_dir)/.ssh/id_rsa -N "" -q)
 	mkdir $(home_dir)/golang && chown $(user).$(user) $(home_dir)/golang
 	mkdir $(home_dir)/bin && chown $(user).$(user) $(home_dir)/bin
 	cp bin/buildservice $(home_dir)/bin/buildservice
