@@ -1,6 +1,7 @@
 package buildrunner
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -31,4 +32,14 @@ func (b *BuildSettings) ArtifactDir() string {
 // BuildspecFile returns the buildspec file path from BuildSettings
 func (b *BuildSettings) BuildspecFile() string {
 	return filepath.Join(b.CodeDir(), b.BuildspecPath)
+}
+
+func (b *BuildSettings) ToString() string {
+	return fmt.Sprintf("Name: %s, ID: %s, URL: %s, Branch: %s, BuildspecPath: %s, WorkingDir: %s",
+		b.Name,
+		b.ID,
+		b.URL,
+		b.Branch,
+		b.BuildspecPath,
+		b.WorkingDir)
 }

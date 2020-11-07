@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/kennygrant/sanitize"
+	"github.com/mouckatron/buildservice/v2/internal/logs"
 	"github.com/mouckatron/go-buildspec/buildspec"
 )
 
@@ -20,25 +21,31 @@ func init() {
 	homeDir, _ = os.UserHomeDir()
 	buildsDir = filepath.Join(homeDir, "builds")
 	os.Mkdir(buildsDir, os.FileMode(int(0750)))
+	logs.LogLevel = logs.DEBUG
 }
 
 // Setup gets the work directory and logger ready
 func Setup(settings *BuildSettings) (err error) {
 
+	logs.Debug("buildrunner.Setup: Setting up build from %s", settings.URL)
+
 	// Name
 	if settings.Name == "" {
 		settings.Name = getNameFromURL(settings.URL)
+		logs.Debug("buildrunner.Setup: Set name to %s", settings.Name)
 	}
 
 	// ID
 	now := time.Now()
 	settings.ID = now.Format("20060102-150405")
+	logs.Debug("buildrunner.Setup: Set ID to %s", settings.ID)
 
 	// work directory
 	settings.WorkingDir = filepath.Join(buildsDir, sanitize.Name(settings.Name), settings.ID)
 	os.MkdirAll(settings.WorkingDir, os.FileMode(int(0750)))
 	os.Mkdir(filepath.Join(settings.WorkingDir, "code"), os.FileMode(int(0750)))
 	os.Mkdir(filepath.Join(settings.WorkingDir, "artifacts"), os.FileMode(int(0750)))
+	logs.Debug("buildrunner.Setup: Set WorkingDir to %s", settings.WorkingDir)
 
 	// logger
 	settings.LogFile, err = os.OpenFile(
@@ -47,16 +54,20 @@ func Setup(settings *BuildSettings) (err error) {
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}
+	logs.Debug("buildrunner.Setup: Created log file")
 
 	settings.Log = log.New(settings.LogFile, "", log.LUTC|log.Lmsgprefix|log.Ldate|log.Ltime)
 
 	settings.Log.Println("Setup complete")
+	logs.Debug("buildrunner.Setup: Setup complete")
 
 	return
 }
 
 // Run the main buildrunner function
 func Run(settings BuildSettings) {
+
+	logs.Debug("buildrunner.Run: Running %s", settings.ToString())
 
 	defer settings.LogFile.Close()
 
@@ -100,7 +111,7 @@ func getCode(settings *BuildSettings) (err error) {
 	return
 }
 
-func getBuildCommands(settings *BuildSettings) (phases map[string]buildspec.Phase, err error) {
+func getBuildCommands(settings *BuildSettings) (phases map[string]*buildspec.Phase, err error) {
 
 	settings.Log.Println("getBuildCommands")
 
@@ -109,6 +120,7 @@ func getBuildCommands(settings *BuildSettings) (phases map[string]buildspec.Phas
 		settings.Log.Fatal(err)
 		return
 	}
+	settings.Log.Println(spec)
 
 	phases = spec.Phases
 

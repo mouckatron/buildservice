@@ -2,17 +2,22 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mouckatron/buildservice/v2/internal/buildrunner"
 )
 
+func init() {
+	log.SetFlags(0)
+}
+
 func main() {
 
 	router := gin.Default()
 
-	router.POST("/build/", build)
+	router.POST("/build", build)
 
 	router.Run()
 

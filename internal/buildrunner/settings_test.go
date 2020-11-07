@@ -47,3 +47,21 @@ func TestBuildSettingsBuildspecFile(t *testing.T) {
 			b.BuildspecFile())
 	}
 }
+
+func TestBuildSettingsToString(t *testing.T) {
+	b := BuildSettings{
+		Name:          "myjob",
+		ID:            "20060102-150405",
+		WorkingDir:    "/home/myjob/20060102-150405",
+		BuildspecPath: "buildspec.yml",
+		Branch:        "master",
+		URL:           "https://github.com/mouckatron/buildservice.git"}
+
+	expected := "Name: myjob, ID: 20060102-150405, URL: https://github.com/mouckatron/buildservice.git, Branch: master, BuildspecPath: buildspec.yml, WorkingDir: /home/myjob/20060102-150405"
+
+	if b.ToString() != expected {
+		t.Errorf("Wrong ToString: wanted %s, got %s",
+			expected,
+			b.ToString())
+	}
+}
