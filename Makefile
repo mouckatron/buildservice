@@ -7,7 +7,7 @@ test:
 	go test
 
 build:
-	go build -o bin/buildservice cmd/buildservice/main.go
+	cd cmd/buildservice && go build -o ../../bin/buildservice ; cd ../..
 
 install:
 	id -u $(user) || (useradd -mrU -s /bin/bash $(user) && sudo -u $(user) ssh-keygen -t rsa -b 2048 -f $(home_dir)/.ssh/id_rsa -N "" -q)
