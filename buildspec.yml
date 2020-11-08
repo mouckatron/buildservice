@@ -6,7 +6,7 @@ phases:
   pre_build:
     commands:
       - echo installing dependencies...
-      - go get -u
+      - cd cmd/buildservice && go get -u ; cd ../..
   build:
     commands:
       # - echo testing...
@@ -16,4 +16,4 @@ artifacts:
   files:
     - "**/*"
   discard-paths: no
-  base-directory: dist/arclog
+  base-directory: bin/
