@@ -34,6 +34,7 @@ func (b *BuildSettings) BuildspecFile() string {
 	return filepath.Join(b.CodeDir(), b.BuildspecPath)
 }
 
+// ToString returns a debug log printable version of the struct
 func (b *BuildSettings) ToString() string {
 	return fmt.Sprintf("Name: %s, ID: %s, URL: %s, Branch: %s, BuildspecPath: %s, WorkingDir: %s",
 		b.Name,

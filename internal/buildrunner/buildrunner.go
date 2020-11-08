@@ -16,6 +16,7 @@ import (
 
 var homeDir string
 var buildsDir string
+var phaseOrder = []string{"install", "pre_build", "build", "post_build"}
 
 func init() {
 	homeDir, _ = os.UserHomeDir()
@@ -52,7 +53,7 @@ func Setup(settings *BuildSettings) (err error) {
 		filepath.Join(settings.WorkingDir, "build.log"),
 		os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatalf("error opening file: %v", err)
+		log.Printf("error opening file: %v", err)
 	}
 	logs.Debug("buildrunner.Setup: Created log file")
 
@@ -79,23 +80,25 @@ func Run(settings BuildSettings) {
 	settings.Log.Println(err)
 
 	if err != nil {
-		settings.Log.Fatal(err)
+		settings.Log.Println(err)
 		return
 	}
 
-	for _, phase := range phases {
-		settings.Log.Printf("Starting PHASE %s", phase.Name)
+	for _, phaseName := range phaseOrder {
+		if phase, ok := phases[phaseName]; ok {
+			settings.Log.Printf("Starting PHASE %s", phase.Name)
 
-		for _, command := range phase.Commands {
-			settings.Log.Printf("Executing command %s", command)
-			output, err := execCmd(settings.CodeDir(), command)
-			if err != nil {
-				settings.Log.Fatal(err)
+			for _, command := range phase.Commands {
+				settings.Log.Printf("Executing command %s", command)
+				output, err := execCmd(settings.CodeDir(), command)
+				if err != nil {
+					settings.Log.Println(err)
+				}
+				settings.Log.Println(output)
 			}
-			settings.Log.Println(output)
-		}
 
-		settings.Log.Printf("Finished PHASE %s", phase.Name)
+			settings.Log.Printf("Finished PHASE %s", phase.Name)
+		}
 	}
 
 	settings.Log.Println("Build complete")
@@ -117,7 +120,7 @@ func getBuildCommands(settings *BuildSettings) (phases map[string]*buildspec.Pha
 
 	spec, err := buildspec.LoadFromFile(settings.BuildspecFile())
 	if err != nil {
-		settings.Log.Fatal(err)
+		settings.Log.Println(err)
 		return
 	}
 	settings.Log.Println(spec)
@@ -168,12 +171,30 @@ func getCodeWithGit(settings *BuildSettings) (err error) {
 	return
 }
 
-func execCmd(dir string, cmd string, args ...string) (output string, err error) {
-	c := exec.Command(cmd, args...)
+func execCmd(dir string, args ...string) (output string, err error) {
+
+	f, err := os.OpenFile(
+		filepath.Join(dir, "commands.sh"),
+		os.O_RDWR|os.O_CREATE|os.O_APPEND, 0750)
+	if err != nil {
+		log.Printf("error opening file: %v", err)
+		return
+	}
+	defer f.Close()
+
+	f.WriteString("#! /bin/bash\n")
+	f.WriteString(strings.Join(args, " "))
+	logs.Debug(strings.Join(args, " "))
+
+	c := exec.Command("/bin/bash", "commands.sh")
 	c.Dir = dir
+	logs.Debug(c.String())
 	_output, err := c.CombinedOutput()
 
 	output = string(_output)
+	logs.Debug(output)
+
+	os.Remove(filepath.Join(dir, "commands.sh"))
 
 	return
 }
